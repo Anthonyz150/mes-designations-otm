@@ -1,96 +1,55 @@
-'use client';
-
-import { useState, useEffect } from 'react';
-import { Designation } from '@/lib/types';
-import MatchCard from '@/components/MatchCard';
-import { supabase } from '@/supabase';
-
-export default function DesignationsPage() {
-  const [designations, setDesignations] = useState<Designation[]>([]);
-  const [filterStatus, setFilterStatus] = useState<string>('Tous');
-
-  useEffect(() => {
-    async function fetchDesignations() {
-      const { data, error } = await supabase.from('designations').select('*');
-      if (error) {
-        console.error('Erreur lors du chargement :', error);
-      } else if (data) {
-        setDesignations(data);
-      }
-    }
-    fetchDesignations();
-  }, []);
-
-  const handleDelete = async (id: string) => {
-    if (confirm('Voulez-vous vraiment supprimer cette désignation ?')) {
-      const { error } = await supabase.from('designations').delete().eq('id', id);
-      if (error) {
-        console.error('Erreur lors de la suppression :', error);
-      } else {
-        const updated = designations.filter((d) => d.id !== id);
-        setDesignations(updated);
-      }
-    }
-  };
-
-  const handleValidate = async (id: string, matchSheetName: string) => {
-    const { error } = await supabase
-      .from('designations')
-      .update({ status: 'Effectuée', matchSheetName })
-      .eq('id', id);
-
-    if (error) {
-      console.error('Erreur lors de la validation :', error);
-    } else {
-      const updated = designations.map((d) => {
-        if (d.id === id) {
-          return { ...d, status: 'Effectuée' as const, matchSheetName };
-        }
-        return d;
-      });
-      setDesignations(updated);
-    }
-  };
-
-  const officialList = designations.filter(d => !d.isVolunteering);
-  const filtered = officialList.filter((d) => {
-    if (filterStatus === 'Tous') return true;
-    return d.status === filterStatus;
-  });
-
-  return (
-    <div>
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
-        <div>
-          <h1 className="text-3xl font-black tracking-tight text-white">Mes Désignations Officielles</h1>
-          <p className="text-slate-400 mt-1">Historique de tes matchs officiels et validation e-Marque.</p>
+<div className="space-y-4 mb-20 md:mb-6">
+  {/* VUE MOBILE : Cartes empilées verticales (affichée uniquement sur téléphone) */}
+  <div className="block sm:hidden space-y-3">
+    {designations.map((item) => (
+      <div key={item.id} className="bg-[#1e3e62]/30 border border-[#1e3e62] rounded-2xl p-4 space-y-3">
+        <div className="flex justify-between items-center">
+          <span className="text-xs font-bold text-orange-400">{item.competition}</span>
+          <span className="text-xs font-semibold text-slate-300 bg-slate-950 px-2 py-1 rounded-lg">
+            {item.date} • {item.time}
+          </span>
         </div>
-        <div className="flex gap-2 bg-[#1e3e62]/40 p-1.5 rounded-xl border border-[#1e3e62]">
-          {['Tous', 'À venir', 'Effectuée'].map((status) => (
-            <button
-              key={status}
-              onClick={() => setFilterStatus(status)}
-              className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
-                filterStatus === status ? 'bg-orange-600 text-white shadow' : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              {status}
-            </button>
-          ))}
+        <div className="text-sm font-black text-white">
+          {item.home_team} vs {item.away_team}
+        </div>
+        <div className="text-xs text-slate-300 flex items-center gap-1">
+          <span>📍</span> {item.venue}
+        </div>
+        <div className="flex justify-between items-center pt-2 border-t border-slate-800">
+          <span className="text-xs bg-slate-950 px-2.5 py-1 rounded-lg text-slate-300 font-medium">
+            {item.role}
+          </span>
+          {/* Boutons d'actions rapides */}
         </div>
       </div>
+    ))}
+  </div>
 
-      {filtered.length === 0 ? (
-        <div className="bg-[#1e3e62]/20 border border-[#1e3e62] rounded-2xl p-12 text-center text-slate-400">
-          Aucune désignation officielle trouvée.
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filtered.map((d) => (
-            <MatchCard key={d.id} designation={d} onDelete={handleDelete} onValidate={handleValidate} />
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
+  {/* VUE TABLETTE / PC : Tableau classique (masqué sur mobile, affiché à partir de 'sm') */}
+  <div className="hidden sm:block overflow-x-auto rounded-2xl border border-[#1e3e62] bg-[#1e3e62]/20">
+    <table className="w-full text-left text-sm text-slate-300">
+      <thead className="bg-slate-950 text-xs uppercase text-slate-400 border-b border-[#1e3e62]">
+        <tr>
+          <th className="px-4 py-3">Date / Heure</th>
+          <th className="px-4 py-3">Compétition</th>
+          <th className="px-4 py-3">Match</th>
+          <th className="px-4 py-3">Salle</th>
+          <th className="px-4 py-3">Rôle</th>
+          <th className="px-4 py-3 text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody className="divide-y divide-[#1e3e62]/40">
+        {designations.map((item) => (
+          <tr key={item.id} className="hover:bg-slate-900/40 transition">
+            <td className="px-4 py-3 font-medium whitespace-nowrap">{item.date} <br/><span className="text-xs text-slate-500">{item.time}</span></td>
+            <td className="px-4 py-3 font-bold text-orange-400">{item.competition}</td>
+            <td className="px-4 py-3 text-white font-medium">{item.home_team} vs {item.away_team}</td>
+            <td className="px-4 py-3 text-slate-400">{item.venue}</td>
+            <td className="px-4 py-3"><span className="bg-slate-950 px-2.5 py-1 rounded-lg text-xs">{item.role}</span></td>
+            <td className="px-4 py-3 text-right">...</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>
