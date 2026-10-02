@@ -1,40 +1,34 @@
-'use client';
-
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 
 export default function Navbar() {
-  const pathname = usePathname();
-
-  const navItems = [
-    { href: '/designations', label: 'Désignations' },
-    { href: '/benevolat', label: 'Bénévolat' },
-    { href: '/nouveau', label: 'Ajouter' },
-  ];
-
   return (
-    <header className="bg-slate-950 border-b border-[#1e3e62] px-6 py-4 flex justify-between items-center">
-      <div className="text-xl font-black text-white flex items-center gap-2">
-        <span>🏀</span> <span className="text-orange-500">OTM Manager</span>
-      </div>
-      <nav className="flex gap-4">
-        {navItems.map((item) => {
-          const isActive = pathname === item.href;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition ${
-                isActive
-                  ? 'bg-orange-600 text-white shadow-lg'
-                  : 'text-slate-400 hover:text-white hover:bg-[#1e3e62]/30'
-              }`}
-            >
-              {item.label}
+    <nav className="bg-[#0b192c] text-white shadow-lg border-b border-[#1e3e62]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16">
+          <div className="flex items-center space-x-3">
+            <span className="text-xl font-black bg-gradient-to-r from-orange-500 to-amber-400 bg-clip-text text-transparent">
+              🏀 FFBB OTM Manager
+            </span>
+          </div>
+          <div className="flex items-center space-x-2 sm:space-x-4 overflow-x-auto py-2">
+            <Link href="/" className="hover:text-orange-400 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap">
+              Tableau de bord
             </Link>
-          );
-        })}
-      </nav>
-    </header>
+            <Link href="/designations" className="hover:text-orange-400 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap">
+              Désignations
+            </Link>
+            <Link href="/benevolat" className="hover:text-orange-400 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap">
+              Bénévolat Club
+            </Link>
+            <Link href="/calendrier" className="hover:text-orange-400 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap">
+              Calendrier
+            </Link>
+            <Link href="/nouveau" className="bg-orange-600 hover:bg-orange-500 text-white px-4 py-2 rounded-lg text-sm font-bold transition-all shadow-md whitespace-nowrap">
+              + Ajouter
+            </Link>
+          </div>
+        </div>
+      </div>
+    </nav>
   );
 }
