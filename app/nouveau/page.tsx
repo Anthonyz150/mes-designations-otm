@@ -22,18 +22,19 @@ export default function NouveauPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Correspondance exacte avec les colonnes SQL de la base de données
     const newDesignation = {
       date: form.date,
       time: form.time,
       competition: isVolunteering ? 'Bénévolat Club' : form.competition,
-      homeTeam: form.homeTeam,
-      awayTeam: form.awayTeam,
+      home_team: form.homeTeam,
+      away_team: form.awayTeam,
       venue: form.venue,
       address: form.address,
       role: form.role,
       status: 'À venir',
-      isVolunteering,
-      pdfName: !isVolunteering && pdfFile ? pdfFile.name : null,
+      is_volunteering: isVolunteering,
+      pdf_name: !isVolunteering && pdfFile ? pdfFile.name : null,
     };
 
     const { error } = await supabase
