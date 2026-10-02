@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/supabase';
 import Link from 'next/link';
 
-// Définition du type pour une désignation
 interface Designation {
   id: number;
   date: string;
@@ -23,13 +22,12 @@ export default function DesignationsPage() {
   const [designations, setDesignations] = useState<Designation[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Charger les désignations depuis Supabase au chargement de la page
   useEffect(() => {
     async function fetchDesignations() {
       const { data, error } = await supabase
         .from('designations')
         .select('*')
-        .eq('is_volunteering', false) // Uniquement les désignations officielles
+        .eq('is_volunteering', false)
         .order('date', { ascending: true });
 
       if (error) {
@@ -43,7 +41,6 @@ export default function DesignationsPage() {
     fetchDesignations();
   }, []);
 
-  // Fonction pour supprimer une désignation
   const handleDelete = async (id: number) => {
     if (confirm('Voulez-vous vraiment supprimer cette désignation ?')) {
       const { error } = await supabase.from('designations').delete().eq('id', id);
@@ -54,19 +51,20 @@ export default function DesignationsPage() {
   };
 
   if (loading) {
-    return <div className="text-center text-slate-400 py-10">Chargement de tes désignations...</div>;
+    return <div className="text-center text-slate-400 py-10 md:ml-64">Chargement de tes désignations...</div>;
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-4 sm:p-6 mb-20 md:mb-6">
+    /* Le `md:ml-64` décale le contenu pour ne pas qu'il passe sous la barre latérale PC */
+    <div className="max-w-6xl mx-auto p-4 sm:p-8 md:ml-64 mb-20 md:mb-6">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-black text-white">Mes Désignations Officielles</h1>
+          <h1 className="text-xl sm:text-2xl font-black text-white">Mes Désignations Officielles</h1>
           <p className="text-xs sm:text-sm text-slate-400">Retrouve l'historique et le suivi de tes matchs officiels.</p>
         </div>
         <Link
           href="/nouveau"
-          className="bg-orange-600 hover:bg-orange-500 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition shadow-lg"
+          className="bg-orange-600 hover:bg-orange-500 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition shadow-lg whitespace-nowrap"
         >
           + Ajouter
         </Link>
@@ -78,7 +76,7 @@ export default function DesignationsPage() {
         </div>
       ) : (
         <div className="space-y-4">
-          {/* VERSION MOBILE : Cartes empilées */}
+          {/* VERSION MOBILE : Cartes empilées (visible uniquement sur petit écran) */}
           <div className="block sm:hidden space-y-3">
             {designations.map((item: Designation) => (
               <div key={item.id} className="bg-[#1e3e62]/30 border border-[#1e3e62] rounded-2xl p-4 space-y-3">
@@ -109,7 +107,7 @@ export default function DesignationsPage() {
             ))}
           </div>
 
-          {/* VERSION PC / TABLETTE : Tableau classique */}
+          {/* VERSION PC / TABLETTE : Ton tableau d'origine inchangé */}
           <div className="hidden sm:block overflow-x-auto rounded-2xl border border-[#1e3e62] bg-[#1e3e62]/20">
             <table className="w-full text-left text-sm text-slate-300">
               <thead className="bg-slate-950 text-xs uppercase text-slate-400 border-b border-[#1e3e62]">
@@ -140,7 +138,7 @@ export default function DesignationsPage() {
                     <td className="px-4 py-3 text-right">
                       <button
                         onClick={() => handleDelete(item.id)}
-                        className="text-red-400 hover:text-red-300 text-xs font-medium px-2 py-1 bg-red-950/30 rounded-lg border border-red-900/50"
+                        className="text-red-400 hover:text-red-300 text-xs font-medium px-2.5 py-1.5 bg-red-950/30 rounded-lg border border-red-900/50 hover:bg-red-900/40 transition"
                       >
                         Supprimer
                       </button>
